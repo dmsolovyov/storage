@@ -6,32 +6,42 @@
 DROP TABLE IF EXISTS tasks_labels, tasks, labels, users;
 
 -- пользователи системы
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL
 );
 
 -- метки задач
-CREATE TABLE labels (
+CREATE TABLE IF NOT EXISTS labels (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL
 );
 
 -- задачи
-CREATE TABLE tasks (
+CREATE TABLE IF NOT EXISTS tasks (
     id SERIAL PRIMARY KEY,
-    opened BIGINT NOT NULL DEFAULT extract(epoch from now()), -- время создания задачи
-    closed BIGINT DEFAULT 0, -- время выполнения задачи
-    author_id INTEGER REFERENCES users(id) DEFAULT 0, -- автор задачи
-    assigned_id INTEGER REFERENCES users(id) DEFAULT 0, -- ответственный
-    title TEXT, -- название задачи
-    content TEXT -- задачи
+    opened BIGINT NOT NULL DEFAULT extract(epoch from now()),
+    closed BIGINT DEFAULT 0,
+    author_id INTEGER REFERENCES users(id) DEFAULT 0,
+    assigned_id INTEGER REFERENCES users(id) DEFAULT 0,
+    title TEXT,
+    content TEXT
 );
 
--- связь многие - ко- многим между задачами и метками
-CREATE TABLE tasks_labels (
+-- связь многие-ко-многим
+CREATE TABLE IF NOT EXISTS tasks_labels (
     task_id INTEGER REFERENCES tasks(id),
     label_id INTEGER REFERENCES labels(id)
 );
--- наполнение БД начальными данными
+
+-- начальные данные
 INSERT INTO users (id, name) VALUES (0, 'default');
+
+-- пример обновления задачи
+UPDATE tasks
+SET title = 'Updated Title', content = 'Updated Content'
+WHERE id = 1;
+
+-- пример удаления задачи
+DELETE FROM tasks
+WHERE id = 1;
